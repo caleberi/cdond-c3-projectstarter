@@ -1,5 +1,17 @@
 version: 2.1
 
+executors:
+  node:
+    docker:
+      - image: circleci/node:13.8.0
+  python:
+    docker:
+    - image: python:3.9.0-alpine
+  aws:
+    docker:
+    - image: amazon/aws-cli
+
+
 commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -33,98 +45,181 @@ commands:
             fi
             
 jobs:
+
+  install-back-deps:
+    executor: node
+    steps:
+      - checkout
+      - run:
+        name: npm install
+        working_directory: ./backend
+        command: ls -la && npm install
+      - persist_to_workspace:
+          root: .
+          path:
+            - backend/node_modules
+
+  install-front-deps:
+    executor: node
+    steps:
+      - checkout
+      - run:
+        name: npm install
+        working_directory: ./frontend
+        command: ls -la && npm install
+      - persist_to_workspace:
+          root: .
+          path:
+            - frontend/node_modules
+
   build-frontend:
-    docker:
-      - image: circleci/node:13.8.0
+    executor:  node
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-build]
+        keys: [frontend-build]
       - run:
           name: Build front-end
-          command: npm run build
+          working_directory: ./frontend
+          command: |
+            echo "building backend 🚩"
+            npm run build
       - save_cache:
-          paths: [frontend/node_modules]
-          key: frontend-build
+        paths: [frontend/node_modules]
+        key: frontend-build
 
   build-backend:
-    docker:
-      - image: circleci/node:13.8.0
+    executor:  node
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-build]
+        keys: [backend-build]
       - run:
           name: Back-end build
-          command: npm run build
+          command: |
+            echo "building backend 🚩"
+            npm run build
+          working_directory: ./backend
       - save_cache:
-          paths: [backend/node_modules]
-          key: backend-build
+        paths: [backend/node_modules]
+        key: backend-build
 
   test-frontend:
-    docker:
-      # Docker image here
+    executor:  node
     steps:
-      # Checkout code from git
-      # Restore from cache
-      # Your job code here
-                
+      # - checkout
+      # - attach_workspace:
+      #     at: .
+      # - restore_cache:
+      #   keys: [frontend-build]
+      # - run:
+      #     name: junit coverage reporter installation
+      #     working_directory: ./frontend
+      #     command: |
+      #       echo "junit coverage reporter installation 🔥"
+      #       npm install --save-dev jest-junit
+      # - run:
+      #     name: run tests with JUnit coverage reporter
+      #     working_directory: ./frontend
+      #     command: |
+      #       echo "running tests with JUnit coverage reporter 🏁"
+      #       npm test -- --ci --runInBand --reporters=default --reporters=jest-junit && pwd && ls -la /tmp
+      #     environment:
+      #       JEST_JUNIT_OUTPUT_DIR: ./test_results
+      # - store_test_results:
+      #     path: ./frontend/test_results
+      # - store_artifacts:
+      #     path: ./frontend/test_results
+
   test-backend:
-    docker:
-      # Docker image here
+    executor: node
     steps:
-      # Checkout code from git
-      # Restore from cache
-      # Your job code here
+      # - checkout
+      # - attach_workspace:
+      #     at: .
+      # - restore_cache:
+      #   keys: [frontend-build]
+      # - run:
+      #     name: junit coverage reporter installation
+      #     working_directory: ./backend
+      #     command: |
+      #       echo "junit coverage reporter installation 🔥"
+      #       npm install --save-dev jest-junit
+      # - run:
+      #     name: Run tests with JUnit coverage reporter
+      #     working_directory: ./backend
+      #     command: |
+      #       echo "running tests with JUnit coverage reporter 🏁"
+      #       npm test -- --ci --runInBand --reporters=default --reporters=jest-junit && pwd
+      #     environment:
+      #       JEST_JUNIT_OUTPUT_DIR: ./test_results
+      # - store_test_results:
+      #     path: ./backend/test_results
+      # - store_artifacts:
+      #     path: ./backend/test_results
             
   scan-frontend:
-    docker:
-      # Docker image here
+    executor: node
     steps:
-      # Checkout code from git
-      # Restore from cache
-      # Your job code here
+      # - checkout
+      # - attach_workspace:
+      #     at: .
+      # - run:
+      #     name: Checking Frontend against security vulnerabilities
+      #     working_directory: ./frontend
+      #     command: |
+      #       echo "checking frontend against security vulnerabilities 🔍"
+      #       npm audit --audit-level=critical
 
   scan-backend:
-    docker:
-      # Docker image here
+    executor: node
     steps:
-      # Checkout code from git
-      # Restore from cache
-      # Your job code here
+      # - checkout
+      # - attach_workspace:
+      #     at: .
+      # - run:
+      #     name: Checking Backend against security vulnerabilities
+      #     working_directory: ./backend
+      #     command: |
+      #       echo "checking backend against security vulnerabilities 🔍"
+      #       npm audit --audit-level=critical
 
   deploy-infrastructure:
-    docker:
-      # Docker image here that supports AWS CLI
+    executor: aws
+    branches:
+      only:
+        - master
     steps:
-      # Checkout code from git
-      - run:
-          name: Ensure back-end infrastructure exists
-          command: |
-            aws cloudformation deploy \
-              --template-file .circleci/files/backend.yml \
-              #--tags project=your-tag \
-              # --stack-name "your back-end stack name with workflow id" \
-              # --parameter-overrides ID="your workflow id"  
-              exit 1
-      - run:
-          name: Ensure front-end infrastructure exist
-          command: |
-            aws cloudformation deploy \
-              --template-file .circleci/files/frontend.yml \
-              #--tags project=your-tag \
-              # --stack-name "your front-end stack name with workflow id" \
-              # --parameter-overrides ID="your workflow id"  
-              exit 1
-      - run:
-          name: Add back-end ip to ansible inventory
-          command: |
-            # Your code here
-            exit 1
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/.circleci/ansible/inventory.txt
+      # - checkout
+      # - run:
+      #     name: Install dependencies
+      #     command: yum install -y tar gzip
+      # - run:
+      #     name: Deploy back-end infrastructure
+      #     command: |
+      #       aws cloudformation deploy \
+      #         --template-file .circleci/files/backend.yml \
+      #         #--tags project=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
+      #         # --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+      #         # --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
+      # - run:
+      #     name: Ensure front-end infrastructure exist
+      #     command: |
+      #       aws cloudformation deploy \
+      #         --template-file .circleci/files/frontend.yml \
+      #         #--tags project=your-tag \
+      #         # --stack-name "your front-end stack name with workflow id" \
+      #         # --parameter-overrides ID="your workflow id"  
+      #         exit 1
+      # - run:
+      #     name: Add back-end ip to ansible inventory
+      #     command: |
+      #       # Your code here
+      #       exit 1
+      # - persist_to_workspace:
+      #     root: ~/
+      #     paths:
+      #       - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure      
 
   configure-infrastructure:
@@ -262,8 +357,16 @@ cleanup:
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
+      # install npm packages 
+      - install-front-deps
+      - install-back-deps
+
+      - build-frontend:
+          requires:
+            - install-front-deps
+      - build-backend:
+          requires:
+            - install-back-deps
       - test-frontend:
           requires: [build-frontend]
       - test-backend:
@@ -273,10 +376,10 @@ workflows:
       - scan-frontend:
           requires: [build-frontend]
       - deploy-infrastructure:
-          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend, configure-infrastructure]
           filters:
             branches:
-              only: [test-feature-branch]
+              only: [master]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
