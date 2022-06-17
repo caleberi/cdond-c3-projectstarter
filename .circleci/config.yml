@@ -67,6 +67,10 @@ jobs:
           root: .
           paths:
             - backend/node_modules
+      - save_to_cache:
+        key: build-back
+        paths:
+          - backend/node_modules
 
   install-front-deps:
     executor: node
@@ -78,6 +82,10 @@ jobs:
           command: ls -la && npm install
       - persist_to_workspace:
           root: .
+          paths:
+            - frontend/node_modules
+       - save_to_cache:
+          key: build-front
           paths:
             - frontend/node_modules
 
@@ -117,59 +125,59 @@ jobs:
           paths:
             - backend/dist
 
-#   test-frontend:
-#     executor:  node
-#     steps:
-#       # - checkout
-#       # - attach_workspace:
-#       #     at: .
-#       # - restore_cache:
-#       #   keys: [frontend-build]
-#       # - run:
-#       #     name: junit coverage reporter installation
-#       #     working_directory: ./frontend
-#       #     command: |
-#       #       echo "junit coverage reporter installation 🔥"
-#       #       npm install --save-dev jest-junit
-#       # - run:
-#       #     name: run tests with JUnit coverage reporter
-#       #     working_directory: ./frontend
-#       #     command: |
-#       #       echo "running tests with JUnit coverage reporter 🏁"
-#       #       npm test -- --ci --runInBand --reporters=default --reporters=jest-junit && pwd && ls -la /tmp
-#       #     environment:
-#       #       JEST_JUNIT_OUTPUT_DIR: ./test_results
-#       # - store_test_results:
-#       #     path: ./frontend/test_results
-#       # - store_artifacts:
-#       #     path: ./frontend/test_results
+  test-frontend:
+    executor:  node
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          keys: [build-front]
+      - run:
+          name: junit coverage reporter installation
+          working_directory: ./frontend
+          command: |
+            echo "junit coverage reporter installation 🔥"
+            npm install --save-dev jest-junit
+      - run:
+          name: run tests with JUnit coverage reporter
+          working_directory: ./frontend
+          command: |
+            echo "running tests with JUnit coverage reporter 🏁"
+            npm test -- --ci --runInBand --reporters=default --reporters=jest-junit && pwd && ls -la /tmp
+          environment:
+            JEST_JUNIT_OUTPUT_DIR: ./test_results
+      - store_test_results:
+          path: ./frontend/test_results
+      - store_artifacts:
+          path: ./frontend/test_results
 
-#   test-backend:
-#     executor: node
-#     steps:
-#       # - checkout
-#       # - attach_workspace:
-#       #     at: .
-#       # - restore_cache:
-#       #   keys: [frontend-build]
-#       # - run:
-#       #     name: junit coverage reporter installation
-#       #     working_directory: ./backend
-#       #     command: |
-#       #       echo "junit coverage reporter installation 🔥"
-#       #       npm install --save-dev jest-junit
-#       # - run:
-#       #     name: Run tests with JUnit coverage reporter
-#       #     working_directory: ./backend
-#       #     command: |
-#       #       echo "running tests with JUnit coverage reporter 🏁"
-#       #       npm test -- --ci --runInBand --reporters=default --reporters=jest-junit && pwd
-#       #     environment:
-#       #       JEST_JUNIT_OUTPUT_DIR: ./test_results
-#       # - store_test_results:
-#       #     path: ./backend/test_results
-#       # - store_artifacts:
-#       #     path: ./backend/test_results
+  test-backend:
+    executor: node
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - restore_cache:
+        keys: [build-back]
+      - run:
+          name: junit coverage reporter installation
+          working_directory: ./backend
+          command: |
+            echo "junit coverage reporter installation 🔥"
+            npm install --save-dev jest-junit
+      - run:
+          name: Run tests with JUnit coverage reporter
+          working_directory: ./backend
+          command: |
+            echo "running tests with JUnit coverage reporter 🏁"
+            npm test -- --ci --runInBand --reporters=default --reporters=jest-junit && pwd
+          environment:
+            JEST_JUNIT_OUTPUT_DIR: ./test_results
+      - store_test_results:
+          path: ./backend/test_results
+      - store_artifacts:
+          path: ./backend/test_results
             
 #   scan-frontend:
 #     executor: node
