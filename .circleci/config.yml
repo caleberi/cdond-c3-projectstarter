@@ -194,7 +194,7 @@ jobs:
             cd frontend
             npm install
             echo "checking frontend against security vulnerabilities 🔍"
-            npm audit --audit-level=critical 
+            npm audit --audit-level=critical --force
 
   scan-backend:
     executor: node
@@ -209,7 +209,7 @@ jobs:
             cd backend
             npm install
             echo "checking backend against security vulnerabilities 🔍"
-            npm audit --audit-level=critical 
+            npm audit --audit-level=critical --force
 
 #   deploy-infrastructure:
 #     executor: aws
