@@ -181,33 +181,35 @@ jobs:
       - store_artifacts:
           path: ./backend/test_results
             
-#   scan-frontend:
-#     executor: node
-#     steps:
-#       - checkout
-#       - restore_cache:
-#         keys: [frontend-build]
-#       - run:
-#           name: Checking Frontend against security vulnerabilities
-#           command: |
-#             cd frontend
-#             npm install
-#             echo "checking frontend against security vulnerabilities 🔍"
-#             npm audit --audit-level=critical || true
+  scan-frontend:
+    executor: node
+    steps:
+      - checkout
+      - restore_cache:
+          keys: 
+            - build-front
+      - run:
+          name: Checking Frontend against security vulnerabilities
+          command: |
+            cd frontend
+            npm install
+            echo "checking frontend against security vulnerabilities 🔍"
+            npm audit --audit-level=critical || true
 
-#   scan-backend:
-#     executor: node
-#     steps:
-#       - checkout
-#       - restore_cache:
-#         keys: [backend-build]
-#       - run:
-#           name: Checking Backend against security vulnerabilities
-#           command: |
-#             cd backend
-#             npm install
-#             echo "checking backend against security vulnerabilities 🔍"
-#             npm audit --audit-level=critical || true
+  scan-backend:
+    executor: node
+    steps:
+      - checkout
+      - restore_cache:
+          keys: 
+            - build-back
+      - run:
+          name: Checking Backend against security vulnerabilities
+          command: |
+            cd backend
+            npm install
+            echo "checking backend against security vulnerabilities 🔍"
+            npm audit --audit-level=critical || true
 
 #   deploy-infrastructure:
 #     executor: aws
@@ -404,10 +406,12 @@ workflows:
       - test-backend:
           requires: 
             - build-backend
-      # - scan-backend:
-      #     requires: [build-backend]
-      # - scan-frontend:
-      #     requires: [build-frontend]
+      - scan-backend:
+          requires: 
+            - build-backend
+      - scan-frontend:
+          requires:
+            - build-frontend
       # - deploy-infrastructure:
       #     requires: [test-frontend, test-backend, scan-frontend, scan-backend, configure-infrastructure]
       #     filters:
