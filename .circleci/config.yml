@@ -63,9 +63,9 @@ jobs:
           name: npm install
           working_directory: ./backend
           command: ls -la && npm install
-      - save_cache:
-          key: backend-build
-          paths: 
+       - persist_to_workspace:
+          root: .
+          paths:
             - backend/node_modules
 
   install-front-deps:
@@ -76,18 +76,17 @@ jobs:
           name: npm install
           working_directory: ./frontend
           command: ls -la && npm install
-      - save_cache:
-          key: frontend-build
-          paths: 
+      - persist_to_workspace:
+          root: .
+          paths:
             - frontend/node_modules
 
   build-frontend:
     executor:  node
     steps:
       - checkout
-      - restore_cache:
-          keys: 
-            - frontend-build
+      - attach_workspace:
+          at: .
       - run:
           name: Build front-end
           command: |
@@ -95,14 +94,15 @@ jobs:
             cd ./frontend
             ls -la
             npm run build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - frontend/dist
 
   build-backend:
     executor:  node
     steps:
       - checkout
-      - restore_cache:
-          keys: 
-            - backend-build
       - run:
           name: Back-end build
           command: |
@@ -110,6 +110,10 @@ jobs:
             cd ./backend
             ls -la
             npm run build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - backend/dist
 
 #   test-frontend:
 #     executor:  node
