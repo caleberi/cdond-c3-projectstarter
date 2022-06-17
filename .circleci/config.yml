@@ -13,36 +13,45 @@ executors:
 
 
 commands:
-  destroy-environment:
-    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-    parameters:
-      # Add parameter here   
-    steps:
-      - run:
-          name: Destroy environments
-          when: on_fail
-          command: |
-            # Your code here
-            exit 1
+#   destroy-environment:
+#     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+#     parameters:
+#       when:
+#         type: string
+#       id:
+#         type: string
+#     steps:
+#       - run:
+#           name: Destroy udapeople stack - << parameters.id >>
+#           command: |
+#             echo "Destroy udapeople backend stack - << parameters.id >>"
+#             aws s3 rm s3://udapeople-<< parameter.id >>  --recursive 
+#             aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.id >>
+#             aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.id >>
+#           when: << parameters.when >>
 
-  revert-migrations:
-    description: Revert the last migration if successfully run in the current workflow.
-    parameters:
-      # Add parameter here     
-    steps:
-      - run:
-          name: Revert migrations
-          # Add when this will run
-          command: |
-            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS = 1
-            if(( $SUCCESS==1 )); 
-            then
-            #  cd ~/project/backend
-            #  npm install
-            #  Add revert code here. You can find this in the Getting Started section.
-              exit 1
-            fi
+
+#   revert-migrations:
+#     description: Revert the last migration if successfully run in the current workflow.
+#     parameters:
+#       when:
+#         type: string
+#       id:
+#         type: string  
+#     steps:
+#       - run:
+#           name: Revert migrations
+#           working_directory: ./backend
+#           command: |
+#             SUCCESS=$(curl --insecure https://kvdb.io/LvyGiGVCy2LYFgKRHNz5NQ/accessKey -d 'mykey<< parameters.id >>')
+#             echo $SUCCESS
+#             if [[ "$SUCCESS" == "success" ]]
+#             then
+#               pwd
+#               ls -la
+#               npm run migrations:revert
+#             fi
+#           when: << parameters.when >>
             
 jobs:
 
@@ -104,254 +113,263 @@ jobs:
         paths: [backend/node_modules]
         key: backend-build
 
-  test-frontend:
-    executor:  node
-    steps:
-      # - checkout
-      # - attach_workspace:
-      #     at: .
-      # - restore_cache:
-      #   keys: [frontend-build]
-      # - run:
-      #     name: junit coverage reporter installation
-      #     working_directory: ./frontend
-      #     command: |
-      #       echo "junit coverage reporter installation 🔥"
-      #       npm install --save-dev jest-junit
-      # - run:
-      #     name: run tests with JUnit coverage reporter
-      #     working_directory: ./frontend
-      #     command: |
-      #       echo "running tests with JUnit coverage reporter 🏁"
-      #       npm test -- --ci --runInBand --reporters=default --reporters=jest-junit && pwd && ls -la /tmp
-      #     environment:
-      #       JEST_JUNIT_OUTPUT_DIR: ./test_results
-      # - store_test_results:
-      #     path: ./frontend/test_results
-      # - store_artifacts:
-      #     path: ./frontend/test_results
+#   test-frontend:
+#     executor:  node
+#     steps:
+#       # - checkout
+#       # - attach_workspace:
+#       #     at: .
+#       # - restore_cache:
+#       #   keys: [frontend-build]
+#       # - run:
+#       #     name: junit coverage reporter installation
+#       #     working_directory: ./frontend
+#       #     command: |
+#       #       echo "junit coverage reporter installation 🔥"
+#       #       npm install --save-dev jest-junit
+#       # - run:
+#       #     name: run tests with JUnit coverage reporter
+#       #     working_directory: ./frontend
+#       #     command: |
+#       #       echo "running tests with JUnit coverage reporter 🏁"
+#       #       npm test -- --ci --runInBand --reporters=default --reporters=jest-junit && pwd && ls -la /tmp
+#       #     environment:
+#       #       JEST_JUNIT_OUTPUT_DIR: ./test_results
+#       # - store_test_results:
+#       #     path: ./frontend/test_results
+#       # - store_artifacts:
+#       #     path: ./frontend/test_results
 
-  test-backend:
-    executor: node
-    steps:
-      # - checkout
-      # - attach_workspace:
-      #     at: .
-      # - restore_cache:
-      #   keys: [frontend-build]
-      # - run:
-      #     name: junit coverage reporter installation
-      #     working_directory: ./backend
-      #     command: |
-      #       echo "junit coverage reporter installation 🔥"
-      #       npm install --save-dev jest-junit
-      # - run:
-      #     name: Run tests with JUnit coverage reporter
-      #     working_directory: ./backend
-      #     command: |
-      #       echo "running tests with JUnit coverage reporter 🏁"
-      #       npm test -- --ci --runInBand --reporters=default --reporters=jest-junit && pwd
-      #     environment:
-      #       JEST_JUNIT_OUTPUT_DIR: ./test_results
-      # - store_test_results:
-      #     path: ./backend/test_results
-      # - store_artifacts:
-      #     path: ./backend/test_results
+#   test-backend:
+#     executor: node
+#     steps:
+#       # - checkout
+#       # - attach_workspace:
+#       #     at: .
+#       # - restore_cache:
+#       #   keys: [frontend-build]
+#       # - run:
+#       #     name: junit coverage reporter installation
+#       #     working_directory: ./backend
+#       #     command: |
+#       #       echo "junit coverage reporter installation 🔥"
+#       #       npm install --save-dev jest-junit
+#       # - run:
+#       #     name: Run tests with JUnit coverage reporter
+#       #     working_directory: ./backend
+#       #     command: |
+#       #       echo "running tests with JUnit coverage reporter 🏁"
+#       #       npm test -- --ci --runInBand --reporters=default --reporters=jest-junit && pwd
+#       #     environment:
+#       #       JEST_JUNIT_OUTPUT_DIR: ./test_results
+#       # - store_test_results:
+#       #     path: ./backend/test_results
+#       # - store_artifacts:
+#       #     path: ./backend/test_results
             
-  scan-frontend:
-    executor: node
-    steps:
-      # - checkout
-      # - attach_workspace:
-      #     at: .
-      # - run:
-      #     name: Checking Frontend against security vulnerabilities
-      #     working_directory: ./frontend
-      #     command: |
-      #       echo "checking frontend against security vulnerabilities 🔍"
-      #       npm audit --audit-level=critical
+#   scan-frontend:
+#     executor: node
+#     steps:
+#       - checkout
+#       - restore_cache:
+#         keys: [frontend-build]
+#       - run:
+#           name: Checking Frontend against security vulnerabilities
+#           command: |
+#             cd frontend
+#             npm install
+#             echo "checking frontend against security vulnerabilities 🔍"
+#             npm audit --audit-level=critical || true
 
-  scan-backend:
-    executor: node
-    steps:
-      # - checkout
-      # - attach_workspace:
-      #     at: .
-      # - run:
-      #     name: Checking Backend against security vulnerabilities
-      #     working_directory: ./backend
-      #     command: |
-      #       echo "checking backend against security vulnerabilities 🔍"
-      #       npm audit --audit-level=critical
+#   scan-backend:
+#     executor: node
+#     steps:
+#       - checkout
+#       - restore_cache:
+#         keys: [backend-build]
+#       - run:
+#           name: Checking Backend against security vulnerabilities
+#           command: |
+#             cd backend
+#             npm install
+#             echo "checking backend against security vulnerabilities 🔍"
+#             npm audit --audit-level=critical || true
 
-  deploy-infrastructure:
-    executor: aws
-    branches:
-      only:
-        - master
-    steps:
-      # - checkout
-      # - run:
-      #     name: Install dependencies
-      #     command: yum install -y tar gzip
-      # - run:
-      #     name: Deploy back-end infrastructure
-      #     command: |
-      #       aws cloudformation deploy \
-      #         --template-file .circleci/files/backend.yml \
-      #         #--tags project=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
-      #         # --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-      #         # --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
-      # - run:
-      #     name: Ensure front-end infrastructure exist
-      #     command: |
-      #       aws cloudformation deploy \
-      #         --template-file .circleci/files/frontend.yml \
-      #         #--tags project=your-tag \
-      #         # --stack-name "your front-end stack name with workflow id" \
-      #         # --parameter-overrides ID="your workflow id"  
-      #         exit 1
-      # - run:
-      #     name: Add back-end ip to ansible inventory
-      #     command: |
-      #       # Your code here
-      #       exit 1
-      # - persist_to_workspace:
-      #     root: ~/
-      #     paths:
-      #       - project/.circleci/ansible/inventory.txt
-      # Here's where you will add some code to rollback on failure      
+#   deploy-infrastructure:
+#     executor: aws
+#     branches:
+#       only:
+#         - master
+#     steps:
+#       - checkout
+#       - run:
+#           name: Install dependencies
+#           command: yum install -y tar gzip
+#       - run:
+#           name: Deploy back-end infrastructure
+#           command: |
+#             aws cloudformation deploy \
+#               --template-file .circleci/files/backend.yml \
+#               #--tags project=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
+#               # --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+#               # --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
+#       - run:
+#           name: Deploy front-end infrastructure exist
+#           command: |
+#             aws cloudformation deploy \
+#               --template-file .circleci/files/frontend.yml \
+#               #--tags project=udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
+#               # --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+#               # --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
+#               exit 1
+#       - run:
+#           name: Add back-end ip to ansible inventory
+#           command: |
+#             aws ec2 describe-instances \
+#               --query 'Reservations[*].Instances[*].PublicIpAddress' \
+#               --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+#               --output text >> inventory
+#             cat inventory
+#       - persist_to_workspace:
+#           root: ~/
+#           paths:
+#             - project/.circleci/ansible/inventory.txt
+#       - destroy-environment:
+#           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+#           event: on_fail
 
-  configure-infrastructure:
-    docker:
-      # Docker image here that supports Ansible
-    steps:
-      # Checkout code from git
-      # Add ssh keys with fingerprint
-      # attach workspace
-      - run:
-          name: Install dependencies
-          command: |
-            # Your code here
-            exit 1
-      - run:
-          name: Configure server
-          command: |
-            # Your code here
-            exit 1
-      # Here's where you will add some code to rollback on failure      
+#       # Here's where you will add some code to rollback on failure      
 
-  run-migrations:
-    docker:
-      # Docker image here that supports NodeJS
-    steps:
-      # Checkout code from git
-      - run:
-          name: Run migrations
-          command: |
-            # Your code here
-            exit 1
-      - run:
-          name: Send migration results to memstash
-          command: |
-            # Your code here
-            exit 1
-     # Here's where you will add some code to rollback on failure      
+#   configure-infrastructure:
+#     docker:
+#       # Docker image here that supports Ansible
+#     steps:
+#       # Checkout code from git
+#       # Add ssh keys with fingerprint
+#       # attach workspace
+#       - run:
+#           name: Install dependencies
+#           command: |
+#             # Your code here
+#             exit 1
+#       - run:
+#           name: Configure server
+#           command: |
+#             # Your code here
+#             exit 1
+#       # Here's where you will add some code to rollback on failure      
 
-  deploy-frontend:
-    docker:
-      # Docker image here that supports AWS CLI
-    steps:
-      # Checkout code from git
-      - run:
-          name: Install dependencies
-          command: |
-            # your code here
-      - run:
-          name: Get backend url
-          command: |
-            # your code here
-            export API_URL="http://${BACKEND_IP}:3030"
-            echo "${API_URL}"
-      - run:
-          name: Deploy frontend objects
-          command: |
-            # your code here
-      # Here's where you will add some code to rollback on failure      
+#   run-migrations:
+#     docker:
+#       # Docker image here that supports NodeJS
+#     steps:
+#       # Checkout code from git
+#       - run:
+#           name: Run migrations
+#           command: |
+#             # Your code here
+#             exit 1
+#       - run:
+#           name: Send migration results to memstash
+#           command: |
+#             # Your code here
+#             exit 1
+#      # Here's where you will add some code to rollback on failure      
+
+#   deploy-frontend:
+#     docker:
+#       # Docker image here that supports AWS CLI
+#     steps:
+#       # Checkout code from git
+#       - run:
+#           name: Install dependencies
+#           command: |
+#             # your code here
+#       - run:
+#           name: Get backend url
+#           command: |
+#             # your code here
+#             export API_URL="http://${BACKEND_IP}:3030"
+#             echo "${API_URL}"
+#       - run:
+#           name: Deploy frontend objects
+#           command: |
+#             # your code here
+#       # Here's where you will add some code to rollback on failure      
                     
-  deploy-backend:
-    docker:
-      # Docker image here that supports Ansible
-    steps:
-      # Checkout code from git
-      # Add ssh keys with fingerprint
-      # attach workspace
-      - run:
-          name: Install dependencies
-          command: |
-            # your code here
-      - run:
-          name: Deploy backend
-          command: |
-            # your code here
-      # Here's where you will add some code to rollback on failure  
+#   deploy-backend:
+#     docker:
+#       # Docker image here that supports Ansible
+#     steps:
+#       # Checkout code from git
+#       # Add ssh keys with fingerprint
+#       # attach workspace
+#       - run:
+#           name: Install dependencies
+#           command: |
+#             # your code here
+#       - run:
+#           name: Deploy backend
+#           command: |
+#             # your code here
+#       # Here's where you will add some code to rollback on failure  
 
-  smoke-test:
-    docker:
-      # Lightweight Docker image 
-    steps:
-      # Checkout code from git
-      - run:
-          name: Install dependencies
-          command: |
-            # your code here
-      - run:
-          name: Get backend url
-          command: |
-            # your code here
-      - run:
-          name: Backend smoke test.
-          command: |
-            # your code here
-      - run:
-          name: Frontend smoke test.
-          command: |
-            # your code here
-      # Here's where you will add some code to rollback on failure  
+#   smoke-test:
+#     docker:
+#       # Lightweight Docker image 
+#     steps:
+#       # Checkout code from git
+#       - run:
+#           name: Install dependencies
+#           command: |
+#             # your code here
+#       - run:
+#           name: Get backend url
+#           command: |
+#             # your code here
+#       - run:
+#           name: Backend smoke test.
+#           command: |
+#             # your code here
+#       - run:
+#           name: Frontend smoke test.
+#           command: |
+#             # your code here
+#       # Here's where you will add some code to rollback on failure  
 
-  cloudfront-update:
-    docker:
-      # Docker image here that supports AWS CLI
-    steps:
-      # Checkout code from git
-      - run:
-          name: Install dependencies
-          command: |
-            # your code here
-      - run:
-          name: Update cloudfront distribution
-          command: |
-            # your code here
-      # Here's where you will add some code to rollback on failure  
+#   cloudfront-update:
+#     docker:
+#       # Docker image here that supports AWS CLI
+#     steps:
+#       # Checkout code from git
+#       - run:
+#           name: Install dependencies
+#           command: |
+#             # your code here
+#       - run:
+#           name: Update cloudfront distribution
+#           command: |
+#             # your code here
+#       # Here's where you will add some code to rollback on failure  
 
-cleanup:
-    docker:
-      # Docker image here
-    steps:
-      # Checkout code from git
-      - run:
-          name: Get old stack workflow id
-          command: |
-            # your code here
-            export OldWorkflowID="the id here"
-            export STACKS=[] #put the list of stacks here
-      - run:
-          name: Remove old stacks and files
-          command: |
-            if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
-            then
-              # your code here
-            fi
+# cleanup:
+#     docker:
+#       # Docker image here
+#     steps:
+#       # Checkout code from git
+#       - run:
+#           name: Get old stack workflow id
+#           command: |
+#             # your code here
+#             export OldWorkflowID="the id here"
+#             export STACKS=[] #put the list of stacks here
+#       - run:
+#           name: Remove old stacks and files
+#           command: |
+#             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
+#             then
+#               # your code here
+#             fi
             
 
 workflows:
