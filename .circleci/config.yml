@@ -67,7 +67,7 @@ jobs:
           root: .
           paths:
             - backend/node_modules
-      - save_to_cache:
+      - save_cache:
         key: build-back
         paths:
           - backend/node_modules
@@ -84,7 +84,7 @@ jobs:
           root: .
           paths:
             - frontend/node_modules
-       - save_to_cache:
+       - save_cache:
           key: build-front
           paths:
             - frontend/node_modules
