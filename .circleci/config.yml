@@ -61,6 +61,7 @@ jobs:
       - checkout
       - run:
           name: npm install
+          working_directory: ./backend
           command: ls -la && npm install
       - save_cache:
           key: backend-build
@@ -73,6 +74,7 @@ jobs:
       - checkout
       - run:
           name: npm install
+          working_directory: ./frontend
           command: ls -la && npm install
       - save_cache:
           key: frontend-build
@@ -90,6 +92,8 @@ jobs:
           name: Build front-end
           command: |
             echo "building backend 🚩"
+            cd ./frontend
+            ls -la
             npm run build
 
   build-backend:
@@ -103,6 +107,8 @@ jobs:
           name: Back-end build
           command: |
             echo "building backend 🚩"
+            cd ./backend
+            ls -la
             npm run build
 
 #   test-frontend:
