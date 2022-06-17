@@ -68,9 +68,9 @@ jobs:
           paths:
             - backend/node_modules
       - save_cache:
-        key: build-back
-        paths:
-          - backend/node_modules
+          key: build-back
+          paths:
+            - backend/node_modules
 
   install-front-deps:
     executor: node
@@ -160,8 +160,8 @@ jobs:
       - attach_workspace:
           at: .
       - restore_cache:
-        keys: 
-          - build-back
+          keys: 
+            - build-back
       - run:
           name: junit coverage reporter installation
           working_directory: ./backend
