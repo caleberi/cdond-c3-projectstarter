@@ -103,13 +103,14 @@ jobs:
     executor:  node
     steps:
       - checkout
+      - attach_workspace:
+          at: .
       - run:
           name: Back-end build
           command: |
             echo "building backend 🚩"
             cd ./backend
             ls -la
-            npm install -g typescript
             npm run build
       - persist_to_workspace:
           root: .
