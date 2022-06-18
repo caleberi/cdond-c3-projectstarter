@@ -28,9 +28,14 @@ commands:
           name: Destroy udapeople stack - << parameters.id >>
           command: |
             echo "Destroy udapeople backend stack - << parameters.id >>"
+            aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.id >>
+          when: << parameters.when >>
+      - run:
+          name: Destroy udapeople stack - << parameters.id >>
+          command: |
+            echo "Destroy udapeople frontend and bucket stack - << parameters.id >>"
             aws s3 rm s3://udapeople-<< parameter.id >>  --recursive 
             aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.id >>
-            aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.id >>
           when: << parameters.when >>
 
 
