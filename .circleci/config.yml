@@ -46,7 +46,7 @@ commands:
           name: Revert migrations
           working_directory: ./backend
           command: |
-            SUCCESS=$(curl --insecure https://kvdb.io/LvyGiGVCy2LYFgKRHNz5NQ/accessKey -d 'mykey<< parameters.id >>')
+            SUCCESS=$(curl --insecure https://kvdb.io/LvyGiGVCy2LYFgKRHNz5NQ/DB_MIGRATION_<< parameters.id >> )
             echo $SUCCESS
             if [[ "$SUCCESS" == "success" ]]
             then
