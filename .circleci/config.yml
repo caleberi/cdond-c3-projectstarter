@@ -320,7 +320,7 @@ jobs:
           command: |
             npm run migrations > migration_status
       - run:
-          name: Send migration results to memstash
+          name: Send migration results to kvdb
           working_directory: ./backend
           command: |
             if grep -q "has been executed successfully" migration_status
