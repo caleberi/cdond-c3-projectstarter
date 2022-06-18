@@ -216,9 +216,6 @@ jobs:
 
   deploy-infrastructure:
     executor: aws
-    branches:
-      only:
-        - master
     steps:
       - checkout
       - run:
