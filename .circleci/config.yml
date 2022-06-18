@@ -16,7 +16,7 @@ executors:
 
 
 commands:
-  destroy-environment:
+  destroy_environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
       when:
@@ -34,7 +34,7 @@ commands:
           when: << parameters.when >>
 
 
-  revert-migrations:
+  revert_migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
       when:
@@ -287,7 +287,7 @@ jobs:
             ls -la
             cat inventory
             ansible-playbook -i inventory configure-server.yaml
-      - destroy-environment:
+      - destroy_environment:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           when: on_fail
 #       # Here's where you will add some code to rollback on failure      
@@ -323,7 +323,7 @@ jobs:
               curl https://kvdb.io/LvyGiGVCy2LYFgKRHNz5NQ/DB_MIGRATION_${CIRCLE_WORKFLOW_ID:0:7} -d "failure"
             fi
             echo "WorkflowID=${CIRCLE_WORKFLOW_ID:0:7}"
-      - destroy-environment:
+      - destroy_environment:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           when: on_fail
 
@@ -359,10 +359,10 @@ jobs:
           root: .
           paths:
             - frontend/dist
-      - destroy-environment:
+      - destroy_environment:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           when: on_fail
-      - revert-migrations:
+      - revert_migrations:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           when: on_fail
       # Here's where you will add some code to rollback on failure      
@@ -392,7 +392,7 @@ jobs:
       - destroy_environment:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           when: on_fail
-      - revert-migrations:
+      - revert_migrations:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           when: on_fail
       # Here's where you will add some code to rollback on failure  
