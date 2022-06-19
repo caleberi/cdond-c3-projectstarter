@@ -392,6 +392,7 @@ jobs:
             ansible --version
             pip install awscli
             aws --version
+            npm install -g pm2
       - run:
           name: Deploying backend
           working_directory: ./.circleci/ansible
