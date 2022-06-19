@@ -438,7 +438,7 @@ jobs:
           working_directory: ./backend
           command: |
             export BACKEND_URL=$(curl --insecure https://kvdb.io/LvyGiGVCy2LYFgKRHNz5NQ/BACKEND_URL)
-            curl $BACKEND_URL/api/status
+            curl --insecure "$BACKEND_URL/api/status"
       - run:
           name: Frontend smoke test.
           working_directory: ./backend
