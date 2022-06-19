@@ -397,6 +397,7 @@ jobs:
           working_directory: ./.circleci/ansible
           command: |
             cat inventory
+            export ANSIBLE_HOST_KEY_CHECKING=False
             ansible-playbook -i inventory deploy-server.yml -vv
       - destroy_environment:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
