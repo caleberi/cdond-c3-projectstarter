@@ -394,12 +394,14 @@ jobs:
             aws --version
       - run:
           name: Deploying backend
-          working_directory: ./.circleci/ansible
           command: |
-            cat inventory
+            cd backend
+            npm i
+            npm run build
+            cd ..
+            cat ./.circleci/ansible/inventory.txt
             export ANSIBLE_HOST_KEY_CHECKING=False
-            npm install -g pm2
-            ansible-playbook -i inventory deploy-server.yml -vv
+            ansible-playbook -i ./.circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml --ssh-common-args='-o StrictHostKeyChecking=no'
       - destroy_environment:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           when: on_fail
