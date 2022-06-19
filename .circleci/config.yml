@@ -473,10 +473,10 @@ jobs:
           name: Keep old WorkflowID in Kvdb for cleanup job
           working_directory: ./.circleci/files
           command: |
-            WorkflowID=$(aws cloudformation \
+            export OldWorkflowID=$(aws cloudformation \
               list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
               --no-paginate --output text)
-            curl  --insecure "https://kvdb.io/LvyGiGVCy2LYFgKRHNz5NQ/WorkflowID" -d "$WorkflowID"
+            curl  --insecure "https://kvdb.io/LvyGiGVCy2LYFgKRHNz5NQ/WorkflowID" -d "$OldWorkflowID"
       - run:
           name: Update cloudfront distribution
           working_directory: ./.circleci/files
