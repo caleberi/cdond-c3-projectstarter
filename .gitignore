@@ -68,5 +68,4 @@ node_modules
 
 .env
 dist
-submission/*
 *.pem
