@@ -560,6 +560,7 @@ workflows:
             branches:
               only:
                 - main
+                - /^m/
       - deploy-frontend:
           requires: [run-migrations]
       - deploy-backend:
