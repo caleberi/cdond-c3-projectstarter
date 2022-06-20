@@ -52,7 +52,7 @@ commands:
           name: Revert migrations
           working_directory: ./backend
           command: |
-            SUCCESS=$(curl --insecure https://kvdb.io/fv5uvtLDRAqt89Xc95Qak/DB_MIGRATION)
+            SUCCESS=$(curl --insecure https://kvdb.io/C9XdCWrJYGkUAb2fTYxQ6i/DB_MIGRATION)
             echo $SUCCESS
             if [[ "$SUCCESS" == "success" ]]
             then
@@ -236,15 +236,15 @@ jobs:
               --tags project=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" 
-      - run:
-            name: Save backend URL in kvdb
-            command: |
-              BACKEND_IP=$(aws ec2 describe-instances \
-                --query 'Reservations[*].Instances[*].PublicIpAddress' \
-                --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-                --output text)
+      # - run:
+      #       name: Save backend URL in kvdb
+      #       command: |
+      #         BACKEND_IP=$(aws ec2 describe-instances \
+      #           --query 'Reservations[*].Instances[*].PublicIpAddress' \
+      #           --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+      #           --output text)
 
-              curl https://kvdb.io/fv5uvtLDRAqt89Xc95Qak/BACKEND_URL -d "http://${BACKEND_IP}:3030"
+      #         curl -k https://kvdb.io/C9XdCWrJYGkUAb2fTYxQ6i/BACKEND_URL -d "http://${BACKEND_IP}:3030"
       - run:
           name: Deploy front-end infrastructure exist
           command: |
@@ -324,10 +324,10 @@ jobs:
             if grep -q "has been executed successfully" ~/project/backend/migration_status.txt
             then
               echo "DB migration was successful, will update kvdb..."
-              curl  --insecure "https://kvdb.io/fv5uvtLDRAqt89Xc95Qak/DB_MIGRATION" -d "success"
+              curl  -k "https://kvdb.io/C9XdCWrJYGkUAb2fTYxQ6i/DB_MIGRATION" -d "success"
             else
               echo "DB migration failed, please verify setup! Probably the database already exists. Verify setup!"
-              curl  --insecure "https://kvdb.io/fv5uvtLDRAqt89Xc95Qak/DB_MIGRATION" -d "failure"
+              curl  -k "https://kvdb.io/C9XdCWrJYGkUAb2fTYxQ6i/DB_MIGRATION" -d "failure"
             fi
             echo "WorkflowID=${CIRCLE_WORKFLOW_ID:0:7}"
       - destroy_environment:
@@ -483,7 +483,7 @@ jobs:
             export OldWorkflowID=$(aws cloudformation \
               list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
               --no-paginate --output text)
-            curl  --insecure "https://kvdb.io/fv5uvtLDRAqt89Xc95Qak/WorkflowID" -d "$OldWorkflowID"
+            curl  -k "https://kvdb.io/C9XdCWrJYGkUAb2fTYxQ6i/WorkflowID" -d "$OldWorkflowID"
       - run:
           name: Update cloudfront distribution
           working_directory: ./.circleci/files
@@ -505,7 +505,7 @@ jobs:
       - run:
           name: Cleaning up old environment
           command: |
-            OldWorkflowID=$(curl  --insecure https://kvdb.io/fv5uvtLDRAqt89Xc95Qak/WorkflowID )
+            OldWorkflowID=$(curl  --insecure https://kvdb.io/C9XdCWrJYGkUAb2fTYxQ6i/WorkflowID )
             CurrentWorkflowID=${CIRCLE_WORKFLOW_ID:0:7}
 
             if [[ "$CurrentWorkflowID" != "$OldWorkflowID" ]]
@@ -560,7 +560,6 @@ workflows:
             branches:
               only:
                 - main
-                - /^m/
       - deploy-frontend:
           requires: [run-migrations]
       - deploy-backend:
