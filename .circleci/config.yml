@@ -355,7 +355,7 @@ jobs:
           name: Retrieve backend url
           command: |
             export BACKEND_IP=$(aws ec2 describe-instances \
-                --query 'Reservations[*].Instances[*].PublicIpAddress' \
+                --query 'Reservations[*].Instances[*].PublicDnsName' \
                 --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
                 --output text)
             export API_URL="http://${BACKEND_IP}:3030"
@@ -436,7 +436,7 @@ jobs:
           working_directory: ./backend
           command: |
             export BACKEND_IP=$(aws ec2 describe-instances \
-                --query 'Reservations[*].Instances[*].PublicIpAddress' \
+                --query 'Reservations[*].Instances[*].PublicDnsName' \
                 --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
                 --output text)
             export API_URL="http://${BACKEND_IP}:3030"
@@ -560,7 +560,7 @@ workflows:
               only:
                 - main
       - deploy-frontend:
-          requires: [run-migrations]
+          requires: [run-migrations,deploy-backend]
       - deploy-backend:
           requires: [run-migrations]
       - smoke-test:
